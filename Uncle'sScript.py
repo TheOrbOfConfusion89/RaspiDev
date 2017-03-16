@@ -32,7 +32,7 @@ pygame.init()
 
 ''' Defines '''
 gpioChannel = 4
-animationPath = 'Uncle'sShaders'
+animationPath = "Uncle'sShaders"
 defaultFrameDuration = 100
 size = w, h = 160, 128 
 log.info("Starting in " + str(size))
@@ -44,12 +44,12 @@ log.debug("Starting...OK")
 Animations = []
 CurrentAnimation = 0
 CurrentFrame = 0
-LastFrameChange = current_milli_time
+LastFrameChange = current_milli_time()
 FPS = 30.0
-MSPerFrame = 1000.0/FPS
-
+MSPerFrame = 1.0/FPS
+print("MSPerFrame = " + str(MSPerFrame))
 ###Button
-ButtonIsDown = True
+ButtonIsDown = False
 ButtonFirstWentDown = 0
 ButtonHoldTimeForPower = 5000
 
@@ -62,34 +62,37 @@ log.debug("Resolution: " + str(wi) + "x" + str(he))
 pygame.draw.rect(screen,bg,[0,0,35,64])
 pygame.display.update()
 
-def ParseTiming(filePath)
-	timingList = []
-	f = open(filePath, 'r')
-	for line in f:
-		timingList.append(int(line))
-	f.close()
-	log.info("Found " + len(timingList) + " timing values in " + filePath)
-	return timingList
-	
-def LoadFolder(folderPath)
-	timingList = [defaultFrameDuration]
-	imageList = []
-	for child in folderPath.iter_dir()
-		childStr = str(child.resolve())
-		if childStr == 'Timing.txt':
-			timingList = ParseTiming(childStr)
-		elif childStr.endswith(('.bmp', '.jpeg', 'jpg', '.png'))
-			imageList.append(pygame.image.load(childStr))
-	
-	log.info("Found " + len(imageList) + " frames in " + filePath)
-	return (imageList, timingList)
+def ParseTiming(filePath):
+        timingList = []
+        f = open(filePath, 'r')
+        for line in f:
+                timingList.append(int(line))
+        f.close()
+        log.info("Found " + str(len(timingList)) + " timing values in " + filePath)
+        return timingList
+        
+def LoadFolder(folderPath):
+        timingList = [defaultFrameDuration]
+        imageList = []
+        for child in sorted(folderPath.iterdir()):
+                childStr = str(child.resolve())
+                log.info("Parsing item: " + childStr)
+                if childStr.endswith('Timing.txt'):
+                        timingList = ParseTiming(childStr)
+                elif childStr.endswith(('.bmp', '.jpeg', 'jpg', '.png')):
+                        imageList.append(pygame.image.load(childStr))
+        
+        log.info("Found " + str(len(imageList)) + " frames in " + str(folderPath.resolve()))
+        return (imageList, timingList)
 
-def LoadAnimations()
-	Animations.clear()
-	animationFolder = Path(animationPath)
-	for folder in animationFolder.iter_dir():
-		Animations.append(LoadFolder(folder))
-	log.info("Found " + len(Animations) + " animations total")
+def LoadAnimations():
+        Animations.clear()
+        animationFolder = Path(animationPath)
+        for folder in sorted(animationFolder.iterdir()):
+                log.info("Loading folder: " + str(folder.resolve()))
+                if folder.is_dir():
+                        Animations.append(LoadFolder(folder))
+        log.info("Found " + str(len(Animations)) + " animations total")
 
 def ButtonPressed(channel):
     log.debug("Button has been pressed!")
@@ -98,38 +101,49 @@ GPIO.setup(gpioChannel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #GPIO.add_event_detect(gpioChannel, GPIO.BOTH, callback=ButtonPressed, bouncetime=1000)
 
 LoadAnimations()
+firstFrame = Animations[CurrentAnimation][0][CurrentFrame]
+screen.blit(firstFrame,(0,0))
+pygame.display.update()
+pygame.display.flip()
+LastFrameChange = current_milli_time()
 
 ###Render Loop
 while True:
-	currentTime = current_milli_time
-	gpioDown = GPIO.input(gpioChannel)
-	if gpioDown:
-		if ButtonIsDown:
-			totalTimeDown = currentTime - ButtonFirstWentDown
-			if totalTimeDown > ButtonHoldTimeForPower:
-				break
-		else:
-			ButtonFirstWentDown = currentTime
-	else:
-		ButtonIsDown = false
-	
-	animation = Animations[CurrentAnimation]
-	frames = animation[0]
-	frameTimes = animation[1]
-	frameTime = defaultFrameDuration
-	if CurrentFrame < len(frameTimes):
-		frameTime = frameTimes[CurrentFrame]
-	elif len(frameTimes) > 0:
-		frameTime = frameTimes[-1]
-	
-	if currentTime - LastFrameChange > frameTime:
-		LastFrameChange = currentTime
-		CurrentFrame = CurrentFrame + 1
-		if CurrentFrame >= len(frames):
-			CurrentFrame = 0
-		frame = frames[CurrentFrame]
-		screen.blit(frame,(wi,he))
-		pygame.display.update()
-	time.sleep(MSPerFrame)
-
+        currentTime = current_milli_time()
+        gpioDown = not GPIO.input(gpioChannel)
+        if gpioDown:
+                if ButtonIsDown:
+                        totalTimeDown = currentTime - ButtonFirstWentDown
+                        if totalTimeDown > ButtonHoldTimeForPower:
+                                break
+                else:
+                        ButtonIsDown = True
+                        ButtonFirstWentDown = currentTime
+        else:
+                if ButtonIsDown:
+                        CurrentAnimation = CurrentAnimation+1
+                        if CurrentAnimation >= len(Animations):
+                                CurrentAnimation = 0
+                ButtonIsDown = False
+        
+        animation = Animations[CurrentAnimation]
+        frames = animation[0]
+        frameTimes = animation[1]
+        frameTime = defaultFrameDuration
+        if CurrentFrame < len(frameTimes):
+                frameTime = frameTimes[CurrentFrame]
+        elif len(frameTimes) > 0:
+                frameTime = frameTimes[-1]
+        timeSinceLastFrame = currentTime - LastFrameChange
+        if timeSinceLastFrame > frameTime:
+                LastFrameChange = currentTime
+                CurrentFrame = CurrentFrame + 1
+                if CurrentFrame >= len(frames):
+                        CurrentFrame = 0
+                frame = frames[CurrentFrame]
+                screen.blit(frame,(0,0))
+                pygame.display.flip()
+        time.sleep(MSPerFrame)
+print("cleanup")
 GPIO.cleanup()
+quit()
