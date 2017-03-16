@@ -28,16 +28,23 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 #log.info("Setting /dev/fb1...")
 #os.putenv('SDL_FBDEV','/dev/fb1') #Which framebuffer?
 pygame.init()
+log.info("SDL version: " + str(pygame.get_sdl_version()))
 #log.debug("Setting /dev/fb1...OK")
 
 ''' Defines '''
 gpioChannel = 4
 animationPath = "Uncle'sShaders"
 defaultFrameDuration = 100
-size = w, h = 160, 128 
+#size = w, h = 160, 128
+screenInfo = pygame.display.Info()
+size = w, h = screenInfo.current_w, screenInfo.current_h
 log.info("Starting in " + str(size))
-screen = pygame.display.set_mode(size)
+
 pygame.mouse.set_visible(False)
+#pygame.display.toggle_fullscreen()
+
+screen = pygame.display.set_mode(size, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE)
+
 log.debug("Starting...OK")
 
 ###Animations
@@ -80,13 +87,15 @@ def LoadFolder(folderPath):
                 if childStr.endswith('Timing.txt'):
                         timingList = ParseTiming(childStr)
                 elif childStr.endswith(('.bmp', '.jpeg', 'jpg', '.png')):
-                        imageList.append(pygame.image.load(childStr))
+                        image = pygame.image.load(childStr)
+                        resizedImage = pygame.transform.scale(image, size)
+                        imageList.append(resizedImage)
         
         log.info("Found " + str(len(imageList)) + " frames in " + str(folderPath.resolve()))
         return (imageList, timingList)
 
 def LoadAnimations():
-        Animations.clear()
+        #Animations.clear()
         animationFolder = Path(animationPath)
         for folder in sorted(animationFolder.iterdir()):
                 log.info("Loading folder: " + str(folder.resolve()))
