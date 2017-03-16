@@ -2,6 +2,7 @@ from pathlib import *
 import sys,logging,pygame,time,subprocess,os,datetime
 from pygame.locals import *
 import re
+from subprocess import call
 current_milli_time = lambda: int(round(time.time() * 1000))
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -58,7 +59,8 @@ print("MSPerFrame = " + str(MSPerFrame))
 ###Button
 ButtonIsDown = False
 ButtonFirstWentDown = 0
-ButtonHoldTimeForPower = 2000
+ButtonHoldTimeForScriptShutDown = 2000
+ButtonHoldTimeForPower = 5000
 
 ### Custom Colors
 bg = 50,65,60
@@ -115,7 +117,7 @@ screen.blit(firstFrame,(0,0))
 pygame.display.update()
 pygame.display.flip()
 LastFrameChange = current_milli_time()
-
+ShutdownFileSystem = False
 ###Render Loop
 while True:
         currentTime = current_milli_time()
@@ -123,13 +125,15 @@ while True:
         if gpioDown:
                 if ButtonIsDown:
                         totalTimeDown = currentTime - ButtonFirstWentDown
-                        if totalTimeDown > ButtonHoldTimeForPower:
-                                break
                 else:
                         ButtonIsDown = True
                         ButtonFirstWentDown = currentTime
         else:
                 if ButtonIsDown:
+                        if totalTimeDown > ButtonHoldTimeForScriptShutDown:
+                                if totalTimeDown > ButtonHoldTimeForPower:
+                                        ShutdownFileSystem = True
+                                break
                         CurrentAnimation = CurrentAnimation+1
                         CurrentFrame = 0
                         LastFrameChange = 0
@@ -159,4 +163,6 @@ print("cleanup")
 pygame.display.quit()
 pygame.quit()
 GPIO.cleanup()
+if ShutdownFileSystem:
+        call("sudo shutdown -h now", shell=True)
 quit()
