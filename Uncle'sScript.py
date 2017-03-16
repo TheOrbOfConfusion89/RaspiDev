@@ -13,8 +13,9 @@ log.addHandler(handler)
 
 log.info("Define modules...")
 import RPi.GPIO as GPIO
+
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 import sys,pygame,time,subprocess,os,datetime
 from pygame.locals import *
 import re
@@ -49,3 +50,11 @@ he=screen.get_height()
 log.debug("Resolution: " + str(wi) + "x" + str(he))
 pygame.draw.rect(screen,bg,[0,0,35,64])
 pygame.display.update()
+
+
+
+def ButtonPressed(channel):
+    log.debug("Button has been pressed!")
+
+
+GPIO.add_event_detect(4, GPIO.BOTH, callback=ButtonPressed, bouncetime=1000)
