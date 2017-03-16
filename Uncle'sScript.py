@@ -76,7 +76,7 @@ def LoadFolder(folderPath):
         imageList = []
         for child in sorted(folderPath.iterdir()):
                 childStr = str(child.resolve())
-                log.info("Parsing item: " + childStr)
+#                log.info("Parsing item: " + childStr)
                 if childStr.endswith('Timing.txt'):
                         timingList = ParseTiming(childStr)
                 elif childStr.endswith(('.bmp', '.jpeg', 'jpg', '.png')):
@@ -122,8 +122,8 @@ while True:
         else:
                 if ButtonIsDown:
                         CurrentAnimation = CurrentAnimation+1
-						CurrentFrame = 0
-						LastFrameChange = 0
+                        CurrentFrame = 0
+                        LastFrameChange = 0
                         if CurrentAnimation >= len(Animations):
                                 CurrentAnimation = 0
                 ButtonIsDown = False
@@ -147,5 +147,7 @@ while True:
                 pygame.display.flip()
         time.sleep(MSPerFrame)
 print("cleanup")
+pygame.display.quit()
+pygame.quit()
 GPIO.cleanup()
 quit()
