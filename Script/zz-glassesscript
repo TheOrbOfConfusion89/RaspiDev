@@ -1,0 +1,37 @@
+#! /bin/sh
+# /etc/init.d/zz-glassesscript
+
+### BEGIN INIT INFO
+# Provides:          zz-glassesscript
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Simple script to start a program at boot
+# Description:       Should start fbtft services.
+### END INIT INFO
+# If you want a command to always run, put it here
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting fbtft stuff"
+    # run application you want to start
+    sudo modprobe fbtft dma
+    sudo modprobe fbtft_device name=adafruit18 rotate=90
+    sleep 5
+    fbcp&
+    python "/home/pi/Desktop/RaspiDev/Uncle'sScript.py" &
+    ;;
+  stop)
+    echo "Stopping fbcp"
+    # kill application you want to stop
+    killall fbcp
+    ;;
+  *)
+    echo "Usage: /etc/init.d/noip {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0
