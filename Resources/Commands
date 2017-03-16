@@ -1,2 +1,5 @@
 ctrl+alt+f1 - switch to command prompt
 startx - restart UI
+git add <fileToAdd>
+git commit -a (commits all)
+git push https://github.com/TheOrbOfConfusion89/RaspiDev
