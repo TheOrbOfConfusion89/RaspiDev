@@ -4,6 +4,8 @@ from pygame.locals import *
 import re
 current_milli_time = lambda: int(round(time.time() * 1000))
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG) #CHANGE TO DEBUG TO SEE MORE
 logging.basicConfig(level=logging.DEBUG)
@@ -22,8 +24,6 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
 log.debug("Define modules...OK")
-
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 #log.info("Setting /dev/fb1...")
 #os.putenv('SDL_FBDEV','/dev/fb1') #Which framebuffer?
@@ -58,7 +58,7 @@ print("MSPerFrame = " + str(MSPerFrame))
 ###Button
 ButtonIsDown = False
 ButtonFirstWentDown = 0
-ButtonHoldTimeForPower = 5000
+ButtonHoldTimeForPower = 2000
 
 ### Custom Colors
 bg = 50,65,60
