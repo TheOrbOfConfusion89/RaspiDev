@@ -1,0 +1,11 @@
+Display - https://www.adafruit.com/products/358
+
+Modern fbtft setup - http://lallafa.de/blog/2015/03/fbtft-setup-on-modern-raspbian/
+
+Even more modern - https://www.youtube.com/watch?v=AbCuPrYhETw
+
+Git repository - https://github.com/TheOrbOfConfusion89/RaspiDev
+
+Git UI - http://askubuntu.com/questions/432163/how-to-start-git-gui
+
+Python Gif - http://stackoverflow.com/questions/4904940/python-converting-gif-frames-to-png
