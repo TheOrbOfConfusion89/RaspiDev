@@ -47,6 +47,12 @@ CurrentFrame = 0
 LastFrameChange = current_milli_time
 FPS = 30.0
 MSPerFrame = 1000.0/FPS
+
+###Button
+ButtonIsDown = True
+ButtonFirstWentDown = 0
+ButtonHoldTimeForPower = 5000
+
 ### Custom Colors
 bg = 50,65,60
 
@@ -89,13 +95,24 @@ def ButtonPressed(channel):
     log.debug("Button has been pressed!")
 
 GPIO.setup(gpioChannel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.add_event_detect(gpioChannel, GPIO.BOTH, callback=ButtonPressed, bouncetime=1000)
+#GPIO.add_event_detect(gpioChannel, GPIO.BOTH, callback=ButtonPressed, bouncetime=1000)
 
 LoadAnimations()
 
 ###Render Loop
 while True:
-	gpioDetected = GPIO.input(gpioChannel)
+	currentTime = current_milli_time
+	gpioDown = GPIO.input(gpioChannel)
+	if gpioDown:
+		if ButtonIsDown:
+			totalTimeDown = currentTime - ButtonFirstWentDown
+			if totalTimeDown > ButtonHoldTimeForPower:
+				break
+		else:
+			ButtonFirstWentDown = currentTime
+	else:
+		ButtonIsDown = false
+	
 	animation = Animations[CurrentAnimation]
 	frames = animation[0]
 	frameTimes = animation[1]
@@ -105,7 +122,6 @@ while True:
 	elif len(frameTimes) > 0:
 		frameTime = frameTimes[-1]
 	
-	currentTime = current_milli_time
 	if currentTime - LastFrameChange > frameTime:
 		LastFrameChange = currentTime
 		CurrentFrame = CurrentFrame + 1
@@ -115,3 +131,5 @@ while True:
 		screen.blit(frame,(wi,he))
 		pygame.display.update()
 	time.sleep(MSPerFrame)
+
+GPIO.cleanup()
