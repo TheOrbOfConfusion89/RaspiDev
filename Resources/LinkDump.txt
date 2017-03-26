@@ -76,3 +76,21 @@ syslog output
 $ tail /var/log/messages
 Dec 15 17:38:07 raspberrypi fbcp[4836]: Primary display is 720 x 480
 Dec 15 17:38:07 raspberrypi fbcp[4836]: Second display is 480 x 320 16bps
+
+
+If you are looking for a solution that works on bootup to the console, take a look at this link. Basic rundown:
+
+    Create a file for your startup script and write your script in the file:
+
+    $ sudo nano /etc/init.d/superscript
+
+    Save and exit: Ctrl+X, Y, Enter
+
+    Make the script executable:
+
+    $ sudo chmod 755 /etc/init.d/superscript
+
+    Register script to be run at startup:
+
+    $ sudo update-rc.d superscript defaults
+
