@@ -9,3 +9,26 @@ Git repository - https://github.com/TheOrbOfConfusion89/RaspiDev
 Git UI - http://askubuntu.com/questions/432163/how-to-start-git-gui
 
 Python Gif - http://stackoverflow.com/questions/4904940/python-converting-gif-frames-to-png
+
+
+Adafruit 1.8"
+
+Adafruit 1.8
+
+Product page: http://www.adafruit.com/products/358
+
+Wiring
+Display 	Driver gpio name 	Raspberry Pi 	Remark
+LITE		led 	GPIO18 	Backlight
+MISO 		Used by SD-card
+SCK 		SCLK 	
+MOSI 		MOSI 	
+TFT_CS 		CE0 	TFT Chip Select
+CARD_CS 			microSD Chip Select
+D/C 		dc 	GPIO24 	
+RESET 		reset 	GPIO25 	
+VCC 		3.3V 	
+GND 		GND 	
+
+sudo modprobe fbtft_device name=sainsmart18 speed=16000000
+rotate=0
