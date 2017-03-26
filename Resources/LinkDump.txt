@@ -34,3 +34,45 @@ sudo modprobe fbtft_device name=sainsmart18 speed=16000000
 rotate=0
 
 ls /dev/fb*
+
+
+Framebuffer mirroring
+
+By mirroring /dev/fb0 onto /dev/fb1, we can take advantage of the GPU for hardware accelrated video playback.
+fbcp takes a snapshot of /dev/fb0, copies it to /dev/fb1 and waits 25ms before repeating.
+Snapshotting takes ~10ms and with a 25ms delay it gives roughly 1000/(10+25) = 28fps
+CPU usage: ~2%
+Note: Snapshot and /dev/fb1 driver refresh is not syncronized.
+
+Install fbcp
+
+sudo apt-get install cmake
+git clone https://github.com/tasanakorn/rpi-fbcp
+cd rpi-fbcp/
+mkdir build
+cd build/
+cmake ..
+make
+sudo install fbcp /usr/local/bin/fbcp
+
+Load drivers and fbcp
+
+sudo modprobe fbtft dma
+sudo modprobe fbtft_device name=tinylcd35 rotate=90 speed=48000000 fps=50
+
+# Start fb copying process in the background
+fbcp &
+
+Play video on /dev/fb0, which will also show up on /dev/fb1
+
+omxplayer test_480_320.mpg
+
+Stop framebuffer copy
+
+killall fbcp
+
+syslog output
+
+$ tail /var/log/messages
+Dec 15 17:38:07 raspberrypi fbcp[4836]: Primary display is 720 x 480
+Dec 15 17:38:07 raspberrypi fbcp[4836]: Second display is 480 x 320 16bps
