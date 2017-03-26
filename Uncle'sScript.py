@@ -122,6 +122,8 @@ while True:
         else:
                 if ButtonIsDown:
                         CurrentAnimation = CurrentAnimation+1
+						CurrentFrame = 0
+						LastFrameChange = 0
                         if CurrentAnimation >= len(Animations):
                                 CurrentAnimation = 0
                 ButtonIsDown = False
