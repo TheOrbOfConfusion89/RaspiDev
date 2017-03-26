@@ -32,3 +32,5 @@ GND 		GND
 
 sudo modprobe fbtft_device name=sainsmart18 speed=16000000
 rotate=0
+
+ls /dev/fb*
